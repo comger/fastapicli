@@ -1,0 +1,13 @@
+.vscode
+testing-project
+.mypy_cache
+.pyc
+.ipynb
+.pyc
+.DS_Store
+__pycache__
+*.log
+*.xml
+*.iml
+.coverage
+.venv

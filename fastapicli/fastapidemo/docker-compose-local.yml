@@ -1,0 +1,16 @@
+version: '3'
+services:
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: sxrmsapi
+    restart: always
+    ports:
+      - "8501:80"
+    env_file:
+     - env-backend-sb2.env
+     - env-postgres-sb2.env
+    command: /start-reload.sh 
+    volumes:
+      - ./app:/app

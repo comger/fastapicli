@@ -1,0 +1,50 @@
+image: docker-registry.thunics.org:5000/docker-smartbow:docker-with-compose-v0.0.1
+
+variables:
+  PIP_CACHE_DIR: '$CI_PROJECT_DIR/.cache/pip'
+  GIT_SUBMODULE_STRATEGY: recursive
+
+cache:
+  paths:
+    - .cache/pip
+  key: '$CI_PROJECT_ID'
+
+before_script:
+  - export IMAGE_TAG=liangb_$(date +"%Z_%Y-%m-%d-%H-%M_" -d @$(git show -s --format=%ct $CI_COMMIT_SHA))${CI_COMMIT_SHA:0:6}
+  - echo $IMAGE_TAG
+  - date +%Y-%m-%d,%H:%M:%S
+
+stages:
+  - test
+  - push
+  - deploy
+
+tests:
+  stage: test
+  script:
+    - echo $IMAGE_TAG
+  tags:
+    - gitlab-runner-test
+
+push-test:
+  stage: push
+  script:
+    - docker-compose -f docker-compose-sb2.yml build
+    - docker-compose -f docker-compose-sb2.yml push
+    - docker-compose -f docker-compose-sb2.yml up -d
+  only:
+    - master
+  tags:
+    - gitlab-runner-sb2
+
+deploy-test:
+  stage: deploy
+  script:
+    - docker-compose -f docker-compose-dev.yml up -d
+  only:
+    - master
+    - V6.0
+    - ljk_v6.0
+  when: manual
+  tags:
+    - gitlab-runner-dev

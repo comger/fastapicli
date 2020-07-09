@@ -1,0 +1,21 @@
+version: '3'
+services:
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: sxrmsapi
+    image: docker-registry.thunics.org:5000/sxrmsapi:${IMAGE_TAG}
+    restart: always
+    ports:
+      - "8501:80"
+    env_file:
+     - env-backend-sb2.env
+     - env-postgres-sb2.env
+    command: /start-reload.sh 
+
+networks:
+  default:
+    external:
+      name: backend
+
