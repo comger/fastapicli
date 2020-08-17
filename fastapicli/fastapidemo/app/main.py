@@ -11,7 +11,7 @@ from cms.app import api_router
 from cms.core import config
 from cms.core.db import get_session
 from cms.core.logger import Logger
-from cms.logic.register import register
+
 
 
 logger = Logger().getLogger()
@@ -62,7 +62,6 @@ async def db_session_middleware(request: Request, call_next):
             pgdb.database.connect()
 
         response = await call_next(request)
-        pgdb.database.close()
         return response
     except peewee.OperationalError:
         logger.info('DB reconnecting..')
@@ -77,7 +76,6 @@ async def db_session_middleware(request: Request, call_next):
         return ErrorHandler.handler(e, ttype, tvalue, ttraceback)
 
 
-
 @app.on_event("startup")
 async def startup():
     logger.info('startup')
@@ -86,7 +84,6 @@ async def startup():
     for s in signals:
         loop.add_signal_handler(s, lambda s=s: asyncio.create_task(shutdown(s)))
 
-    register()
     logger.info('startup end')
 
 

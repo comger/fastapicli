@@ -8,15 +8,11 @@ from cms.core.logger import logger
 from cms.logic.common.user import crud_user, Token, UserCreate, UserUpdate, UserUpdateMe, UserOut
 from cms.logic.common.user import crud_role, RoleCreate, RoleUpdate
 
-
 router = APIRouter()
 
 
 @router.post("/login/access-token", response_model=Token, summary='用户登录')
-async def login_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    pgdb=Depends(depends_db)
-):
+async def login_access_token(form_data: OAuth2PasswordRequestForm = Depends(), pgdb=Depends(depends_db)):
     """
     OAuth2 密码模式登录
     """
@@ -24,26 +20,24 @@ async def login_access_token(
     if not status:
         raise HTTPException(status_code=403, detail=user)
 
-    data = {"id": user.id,
-            "uid": user.uid,
-            "username": user.username,
-            "nickname": user.nickname,
-            "email": user.email,
-            "is_superuser": user.is_superuser,
-            "is_active": user.is_active,
-            "role_id": user.role_id,
-            "attrs": user.attrs}
-
-    return {
-        "access_token": create_access_token(data=data),
-        "token_type": "bearer"
+    data = {
+        "id": user.id,
+        "uid": user.uid,
+        "username": user.username,
+        "nickname": user.nickname,
+        "email": user.email,
+        "is_superuser": user.is_superuser,
+        "is_active": user.is_active,
+        "role_id": user.role_id,
+        "attrs": user.attrs
     }
+
+    return {"access_token": create_access_token(data=data), "token_type": "bearer"}
 
 
 @router.get("/users", summary='获取用户列表', response_model=List[UserOut])
 async def read_users(
-    query: str = Query(None, title='搜索关键字',
-                       description='模糊查询匹配(用户名, 昵称, 邮箱和电话)'),
+    query: str = Query(None, title='搜索关键字', description='模糊查询匹配(用户名, 昵称, 邮箱和电话)'),
     pgdb=Depends(depends_db),
     current_user=Depends(get_current_user),
 ):
@@ -52,10 +46,7 @@ async def read_users(
 
 
 @router.get('/users/me', summary='获取当前登录用户信息', response_model=UserOut)
-async def user_me(
-    pgdb=Depends(depends_db),
-    current_user=Depends(get_current_user)
-):
+async def user_me(pgdb=Depends(depends_db), current_user=Depends(get_current_user)):
     """
     获取当前登录用户信息
     """
@@ -67,11 +58,7 @@ async def user_me(
 
 
 @router.put('/users/me', summary='修改当前登录用户信息')
-async def update_user_me(
-    user_in: UserUpdateMe,
-    pgdb=Depends(depends_db),
-    current_user=Depends(get_current_user)
-):
+async def update_user_me(user_in: UserUpdateMe, pgdb=Depends(depends_db), current_user=Depends(get_current_user)):
     """
     获取当前登录用户信息
     """
@@ -81,11 +68,7 @@ async def update_user_me(
 
 
 @router.get('/users/{id}', summary='按ID获取信息', response_model=UserOut)
-async def user_one(
-    id: int = Path(..., title="ID"),
-    pgdb=Depends(depends_db),
-    current_user=Depends(get_current_user)
-):
+async def user_one(id: int = Path(..., title="ID"), pgdb=Depends(depends_db), current_user=Depends(get_current_user)):
     """
     按ID获取信息
     """
@@ -95,11 +78,8 @@ async def user_one(
     return m2d(user)
 
 
-@router.post("/users", summary='添加用户', status_code=201,  response_model=UserOut)
-async def create_user(
-        user_in: UserCreate,
-        pgdb=Depends(depends_db),
-        current_user=Depends(get_current_user)):
+@router.post("/users", summary='添加用户', status_code=201, response_model=UserOut)
+async def create_user(user_in: UserCreate, pgdb=Depends(depends_db), current_user=Depends(get_current_user)):
     """
     添加用户
     """
@@ -108,11 +88,10 @@ async def create_user(
 
 
 @router.put("/users/{id}", summary='编辑用户', status_code=201, response_model=UserOut)
-async def update_user(
-        user_in: UserUpdate,
-        id: int = Path(..., title="ID"),
-        pgdb=Depends(depends_db),
-        current_user=Depends(get_current_user)):
+async def update_user(user_in: UserUpdate,
+                      id: int = Path(..., title="ID"),
+                      pgdb=Depends(depends_db),
+                      current_user=Depends(get_current_user)):
     """
     编辑用户, 覆盖编辑
     """
@@ -122,11 +101,7 @@ async def update_user(
 
 
 @router.delete('/users/{id}', summary='按ID禁用信息')
-async def del_user(
-    id: int = Path(..., title="ID"),
-    pgdb=Depends(depends_db),
-    current_user=Depends(get_current_user)
-):
+async def del_user(id: int = Path(..., title="ID"), pgdb=Depends(depends_db), current_user=Depends(get_current_user)):
     """
     按ID禁用信息
     """
@@ -148,10 +123,7 @@ async def read_roles(
 
 
 @router.post("/roles", summary='添加角色', status_code=201)
-async def create_role(
-        obj_in: RoleCreate,
-        pgdb=Depends(depends_db),
-        current_user=Depends(get_current_user)):
+async def create_role(obj_in: RoleCreate, pgdb=Depends(depends_db), current_user=Depends(get_current_user)):
     """
     添加角色
     """
@@ -160,11 +132,10 @@ async def create_role(
 
 
 @router.put("/roles/{id}", summary='编辑角色', status_code=201)
-async def update_role(
-        obj_in: RoleUpdate,
-        id: int = Path(..., title="ID"),
-        pgdb=Depends(depends_db),
-        current_user=Depends(get_current_user)):
+async def update_role(obj_in: RoleUpdate,
+                      id: int = Path(..., title="ID"),
+                      pgdb=Depends(depends_db),
+                      current_user=Depends(get_current_user)):
     """
     编辑角色, 覆盖编辑
     """
@@ -174,10 +145,7 @@ async def update_role(
 
 
 @router.delete("/roles/{id}", summary='删除角色', status_code=201)
-async def del_role(
-        id: int = Path(..., title="ID"),
-        pgdb=Depends(depends_db),
-        current_user=Depends(get_current_user)):
+async def del_role(id: int = Path(..., title="ID"), pgdb=Depends(depends_db), current_user=Depends(get_current_user)):
     """
     删除角色
     """
