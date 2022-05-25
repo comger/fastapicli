@@ -2,7 +2,7 @@ flake8==3.7.9
 pylint
 python-dotenv==0.13.0
 passlib[bcrypt] 
-pyjwt==1.7.1
+pyjwt==2.4.0
 pytest
 pytest-cov
 pytest-asyncio
